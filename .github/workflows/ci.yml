@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: |
+            backend/fastapi_ai/requirements.txt
+            backend/django_core/requirements.txt
+
+      - name: Install FastAPI dependencies
+        run: python -m pip install -r requirements.txt
+        working-directory: backend/fastapi_ai
+
+      - name: Install Django dependencies
+        run: python -m pip install -r requirements.txt
+        working-directory: backend/django_core
+
+      - name: Run FastAPI tests
+        run: python -m pytest
+        working-directory: backend/fastapi_ai
+
+      - name: Run Django system checks
+        run: python manage.py check
+        working-directory: backend/django_core
+
+      - name: Check Django migrations
+        run: python manage.py migrate --check
+        working-directory: backend/django_core
+
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: frontend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Check frontend formatting
+        run: npx prettier --check "src/**/*.{js,jsx}"
+
+      - name: Build frontend
+        run: npm run build

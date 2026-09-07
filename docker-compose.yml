@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-learning_platform}
+      POSTGRES_USER: ${DATABASE_USER:-learning_platform}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-learning_platform}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  ai:
+    build:
+      context: ./backend/fastapi_ai
+    environment:
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+    ports:
+      - "8001:8001"
+
+  django:
+    build:
+      context: ./backend/django_core
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dev-secret-key}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-true}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DATABASE_NAME: ${DATABASE_NAME:-learning_platform}
+      DATABASE_USER: ${DATABASE_USER:-learning_platform}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-learning_platform}
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      FASTAPI_AI_BASE_URL: http://ai:8001
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+      - ai
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      VITE_DJANGO_API_BASE_URL: ${VITE_DJANGO_API_BASE_URL:-http://localhost:8000/api}
+    ports:
+      - "5173:5173"
+    depends_on:
+      - django
+
+volumes:
+  postgres_data:
