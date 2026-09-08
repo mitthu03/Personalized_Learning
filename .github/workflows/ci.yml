@@ -48,7 +48,7 @@ jobs:
         working-directory: backend/django_core
 
       - name: Check Django migrations
-        run: python manage.py migrate --check
+        run: python manage.py makemigrations --check
         working-directory: backend/django_core
 
   frontend:
