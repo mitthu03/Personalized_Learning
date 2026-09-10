@@ -77,12 +77,12 @@ export default function useAppController() {
   );
 
   async function login(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
     setBusy(true);
     setError("");
     try {
-      // Use api() so it hits /api/auth/token/ properly
-      const data = await api("/auth/token/", {
+      // Changed from /auth/token/ to /token/ so it hits /api/token/
+      const data = await api("/token/", {
         method: "POST",
         body: JSON.stringify({
           username: auth.username,
