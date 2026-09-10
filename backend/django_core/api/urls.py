@@ -1,3 +1,4 @@
+from .views import AnalyzeView, health_check
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
@@ -17,5 +18,6 @@ router.register("path-steps", PathStepViewSet, basename="path-steps")
 
 urlpatterns = [
     path("analyze/", AnalyzeView.as_view(), name="analyze"),
+    path("health/", health_check, name="health_check"),
 ]
 urlpatterns += router.urls

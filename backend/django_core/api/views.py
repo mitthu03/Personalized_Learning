@@ -1,3 +1,6 @@
+from django.http import JsonResponse
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from django.db import transaction
 from rest_framework import parsers, permissions, response, status, views
 
@@ -9,7 +12,11 @@ from resumes.models import Resume
 from .ai_client import AIClient, AIServiceError
 from .serializers import AnalyzeRequestSerializer
 
-
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def health_check(request):
+    return JsonResponse({"status": "ok"})
+    
 class AnalyzeView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [parsers.JSONParser, parsers.MultiPartParser, parsers.FormParser]
