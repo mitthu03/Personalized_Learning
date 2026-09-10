@@ -5,7 +5,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-key")
 DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() == "true"
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")]
+
+# FIX 1: Allow Render host and localhost explicitly
+ALLOWED_HOSTS = os.getenv(
+    "DJANGO_ALLOWED_HOSTS",
+    "personalized-learning-django.onrender.com,localhost,127.0.0.1,*"
+).split(",")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -101,13 +106,14 @@ REST_FRAMEWORK = {
     ),
 }
 
+# FIX 2: Explicit CORS headers & credentials setup
 CORS_ALLOWED_ORIGINS = [
     "https://personalized-learning-frontend-ww6z.onrender.com",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
 
-# Allow all origins if DEBUG is explicitly set to true
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 
 FASTAPI_AI_BASE_URL = os.getenv("FASTAPI_AI_BASE_URL", "http://localhost:8001")
