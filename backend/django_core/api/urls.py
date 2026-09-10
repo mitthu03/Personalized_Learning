@@ -1,6 +1,7 @@
-from .views import AnalyzeView, health_check
+
 from django.urls import path
 from rest_framework.routers import DefaultRouter
+from .views import AnalyzeView, health_check
 
 from jobs.views import JobDescriptionViewSet
 from learning_paths.views import LearningPathViewSet, PathStepViewSet
