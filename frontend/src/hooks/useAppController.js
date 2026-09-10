@@ -81,17 +81,14 @@ export default function useAppController() {
     setBusy(true);
     setError("");
     try {
-      const result = await fetch(`${API_BASE}/auth/token/`, {
+      // Use api() so it hits /api/auth/token/ properly
+      const data = await api("/auth/token/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: auth.username,
           password: auth.password,
         }),
       });
-      if (!result.ok)
-        throw new Error("Login failed. Check username and password.");
-      const data = await result.json();
       localStorage.setItem("accessToken", data.access);
       setToken(data.access);
     } catch (err) {
@@ -106,6 +103,7 @@ export default function useAppController() {
     setBusy(true);
     setError("");
     try {
+      // Hits /api/users/
       await api("/users/", { method: "POST", body: JSON.stringify(auth) });
       await login(event);
     } catch (err) {
