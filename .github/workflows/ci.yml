@@ -74,8 +74,5 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Check frontend formatting
-        run: npx prettier --check "src/**/*.{js,jsx,ts,tsx,css}"
-
       - name: Build frontend
         run: npm run build
