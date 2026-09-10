@@ -76,23 +76,37 @@ export default function useAppController() {
     0,
   );
 
-  async function login(event) {
-    if (event) event.preventDefault();
+async function login(event, credentials = null) {
+    if (event && event.preventDefault) event.preventDefault();
     setBusy(true);
     setError("");
+
+    // Use passed credentials if registering, otherwise fall back to state
+    const payload = credentials || {
+      username: auth.username,
+      password: auth.password,
+    };
+
     try {
-      // Changed from /auth/token/ to /token/ so it hits /api/token/
       const data = await api("/token/", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          username: auth.username,
-          password: auth.password,
+          username: payload.username,
+          password: payload.password,
         }),
       });
+
+      if (!data || !data.access) {
+        throw new Error("Invalid credentials or server response.");
+      }
+
       localStorage.setItem("accessToken", data.access);
       setToken(data.access);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Login failed. Check your credentials.");
     } finally {
       setBusy(false);
     }
@@ -102,12 +116,28 @@ export default function useAppController() {
     event.preventDefault();
     setBusy(true);
     setError("");
+
     try {
-      // Hits /api/users/
-      await api("/users/", { method: "POST", body: JSON.stringify(auth) });
-      await login(event);
+      // 1. Create user in Django DB (/api/users/)
+      const registeredUser = await api("/users/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: auth.username,
+          email: auth.email,
+          password: auth.password,
+        }),
+      });
+
+      // 2. Immediately obtain JWT access token using explicitly passed auth credentials
+      await login(null, {
+        username: auth.username,
+        password: auth.password,
+      });
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Registration failed.");
     } finally {
       setBusy(false);
     }
