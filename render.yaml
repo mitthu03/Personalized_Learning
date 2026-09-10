@@ -32,7 +32,4 @@ services:
     rootDir: ./frontend
     envVars:
       - key: VITE_DJANGO_API_BASE_URL
-        fromService:
-          type: web
-          name: personalized-learning-django
-          property: url
+        sync: false
