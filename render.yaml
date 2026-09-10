@@ -4,6 +4,7 @@ services:
     env: docker
     dockerfilePath: Dockerfile
     rootDir: ./backend/django_core
+    plan: free
     healthCheckPath: /api/
     envVars:
       - key: DJANGO_SECRET_KEY
@@ -12,24 +13,15 @@ services:
         value: "false"
       - key: DJANGO_ALLOWED_HOSTS
         value: "*"
-      - key: AUTH_COOKIE_SECURE
-        value: "true"
-      - key: AUTH_COOKIE_SAMESITE
-        value: "Lax"
-      - key: CORS_ALLOWED_ORIGINS
-        sync: false
       - key: FASTAPI_AI_BASE_URL
         value: https://personalized-learning-ai.onrender.com
-      - key: DATABASE_URL
-        fromDatabase:
-          name: personalized-learning-db
-          property: connectionString
 
   - type: web
     name: personalized-learning-ai
     env: docker
     dockerfilePath: Dockerfile
     rootDir: ./backend/fastapi_ai
+    plan: free
     healthCheckPath: /health
 
   - type: web
@@ -41,7 +33,3 @@ services:
     envVars:
       - key: VITE_DJANGO_API_BASE_URL
         sync: false
-
-databases:
-  - name: personalized-learning-db
-    plan: free
