@@ -102,9 +102,12 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
+    "https://personalized-learning-frontend-ww6z.onrender.com",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+
+# Allow all origins if DEBUG is explicitly set to true
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 
 FASTAPI_AI_BASE_URL = os.getenv("FASTAPI_AI_BASE_URL", "http://localhost:8001")
