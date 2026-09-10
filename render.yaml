@@ -32,8 +32,9 @@ services:
     rootDir: ./backend/fastapi_ai
     healthCheckPath: /health
 
-  - type: static_site
+  - type: web
     name: personalized-learning-frontend
+    env: static
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     rootDir: ./frontend
