@@ -5,7 +5,7 @@ services:
     dockerfilePath: Dockerfile
     rootDir: ./backend/django_core
     plan: free
-    healthCheckPath: /api/
+    healthCheckPath: /api/health/
     envVars:
       - key: DJANGO_SECRET_KEY
         generateValue: true
